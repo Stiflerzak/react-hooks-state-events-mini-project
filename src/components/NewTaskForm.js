@@ -1,52 +1,42 @@
-import React from "react";
-import  { useState } from "react";
+import React, { useState } from "react";
 
+function NewTaskForm({categories, onTaskFormSubmit}) {
 
-function NewTaskForm({categories, onTaskFormSubmit }) {
-  const categoryOptions = categories.map((category) => {
-    return (
-      <option key={category}>{category}</option>
-    ) 
-  })
+  const [task, setTask] = useState("");
+  const [selection, setSelection] = useState("");
 
-  const [text, setText] = useState('')
-  const [category, setCategory] = useState('Code')
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    const taskObject = {
+      text: task,
+      category: selection
+    };
 
-  function handleSubmit(e) {
-    e.preventDefault()
-
-    const newTask= {
-      text,
-      category
-    }
-  onTaskFormSubmit(newTask)
-
-    setText('')
-    setCategory('Code')
+    onTaskFormSubmit(taskObject);
   }
 
+  const handleDetails = (e) => {
+    setTask(e.target.value);
+  }
+  const handleSelect = (e) => {
+    setSelection(e.target.value);
+  }
+
+  const options = categories.slice(1).map((opt, index) => {
+    return <option key={index} value={opt}>{opt}</option>
+  });
+
   return (
-    <form onSubmit={handleSubmit} className="new-task-form">
+    <form className="new-task-form" onSubmit={handleOnSubmit}>
       <label>
         Details
-        
-        <input 
-        type="text"
-        name="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        />
+        <input type="text" name="text" onChange={handleDetails}/>
       </label>
       <label>
         Category
-        
+        <select name="category" onChange={handleSelect}>
           {/* render <option> elements for each category here */}
-          <select 
-          name="category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          >
-            {categoryOptions}
+          {options}
         </select>
       </label>
       <input type="submit" value="Add task" />

@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import CategoryFilter from "./CategoryFilter";
 import NewTaskForm from "./NewTaskForm";
 import TaskList from "./TaskList";
@@ -9,43 +8,36 @@ console.log("Here's the data you're working with");
 console.log({ CATEGORIES, TASKS });
 
 function App() {
-  const [ category,setCategory] = useState("All")
-  const[ tasks, setTasks] = useState(TASKS)
 
-  const visibleTasks = tasks.filter(
-    (task) => category === "All" || task.category === category
-  )
-  function handleDelete(deletedTaskText) {
-    setTasks(tasks.filter(
-      (task) => task.text !== deletedTaskText
-    ))
+  const [tasks, setTasks] = useState(TASKS);
+  const [categories, setCategories] = useState(CATEGORIES);
 
+  const filterCategories = (category) => {
+    categories.forEach(cat => {
+      cat !== category ?
+        document.querySelector(`.${cat}`).classList.remove("selected") :
+        document.querySelector(`.${category}`).classList.add("selected");
+      setTasks(() => tasks.filter(task => category === "All" ? true : task.category === category));
+    })
   }
 
+  const updateTasks = (text) => {
+    const updatedTasks = [...tasks, text];
+    setTasks(updatedTasks);
+  }
 
-  function addTask(newTask) {
-    const newTaskArray = [...tasks, newTask]
-    setTasks(newTaskArray)
-
+  const removeTasks = (index) => {
+    tasks.splice(index, 1);
+    const updatedTasks = [...tasks];
+    setTasks(() => {return updatedTasks});
   }
 
   return (
     <div className="App">
       <h2>My tasks</h2>
-      <CategoryFilter 
-      categories={CATEGORIES}
-      selectedCategoryFilter={category}
-      setSelectedCategoryFilter={setCategory}
-      />
-      <NewTaskForm 
-      categories={CATEGORIES}
-      onTaskSubmit={addTask}
-      
-      />
-      <TaskList 
-      tasks={visibleTasks}
-      onDelete={handleDelete}
-      />
+      <CategoryFilter categories={categories} onFilter={filterCategories}/>
+      <NewTaskForm categories={categories} onTaskFormSubmit={updateTasks}/>
+      <TaskList tasks={tasks} onRemove={removeTasks}/>
     </div>
   );
 }
